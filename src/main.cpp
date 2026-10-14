@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "language_model.h"
+
 using namespace std;
 
 // command line arguments structure
@@ -16,6 +18,7 @@ struct Arguments {
 // throws invalid_argument on error
 Arguments parseArguments(int argc, char* argv[]) {
     Arguments args;       // create an Arguments struct with default values
+                          // and call it args  (like an empty box)
     int i = 1;
 
     // 1. check if optional -a argument exists
@@ -94,11 +97,21 @@ int main(int argc, char* argv[]) {
     try {
         Arguments args = parseArguments(argc, argv);
 
-        // for now, just print the parsed arguments to verify correctness
-        cout << "alpha  = " << args.alpha << "\n";
-        cout << "n      = " << args.n << "\n";
-        cout << "file   = " << args.filename << "\n";
-        cout << "length = " << args.length << "\n";
+        LanguageModel model;
+        model.trainFromFile(args.filename, args.n);
+
+        // for now, just print the training output to verify correctness
+        cout << "text length = " << model.text().size() << "\n";
+        cout << "alphabet size = " << model.alphabetSize() << "\n";
+        cout << "alphabet = ";
+        for (char c : model.alphabet()){
+            if (c == ' ')       cout << "_"; 
+            else if (c == '\n') cout << "\\n";
+            else if (c == '\t') cout << "\\t";
+            else                cout << c;
+            cout << " ";
+        }
+        cout << "\n";
     } catch (const exception& e) {
         cerr << "slm: " << e.what() << "\n";
         return 1;
