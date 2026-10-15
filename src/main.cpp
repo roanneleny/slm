@@ -103,15 +103,25 @@ int main(int argc, char* argv[]) {
         // for now, just print the training output to verify correctness
         cout << "text length = " << model.text().size() << "\n";
         cout << "alphabet size = " << model.alphabetSize() << "\n";
-        cout << "alphabet = ";
-        for (char c : model.alphabet()){
-            if (c == ' ')       cout << "_"; 
-            else if (c == '\n') cout << "\\n";
-            else if (c == '\t') cout << "\\t";
-            else                cout << c;
+        cout << "total n-grams = " << model.totalNgrams() << "\n";
+        cout << "n-gram frequencies:\n";
+        for (const auto& pair : model.ngramCounts()) {
+            const string& ngram = pair.first;
+            int count = pair.second;
+            double freq = model.ngramFrequency(ngram);
+
             cout << " ";
+
+            for (char c : ngram){
+                if (c == ' ')       cout << "_"; 
+                else if (c == '\n') cout << "\\n";
+                else if (c == '\t') cout << "\\t";
+                else                cout << c;
+            }
+            cout << ": count = " << count
+                << ", frequency = " << freq << "\n";
         }
-        cout << "\n";
+
     } catch (const exception& e) {
         cerr << "slm: " << e.what() << "\n";
         return 1;

@@ -1,6 +1,7 @@
 #ifndef LANGUAGE_MODEL_H
 #define LANGUAGE_MODEL_H
 
+#include <map>
 #include <set>
 #include <string>
 
@@ -17,10 +18,17 @@ public:
     std::size_t alphabetSize() const { return alphabet_.size(); }
     int n() const { return n_; }
 
+    const std::map<std::string, int>& ngramCounts() const { return ngramCounts_;}
+    int totalNgrams() const { return totalNgrams_; }
+    double ngramFrequency(const std::string& ngram) const;
+
 private:
     std::string text_;          // training text content
     std::set<char> alphabet_;   // all unique characters that have appeared
     int n_ = 0;                 // n-gram length
+
+    std::map<std::string, int> ngramCounts_; // map of n-grams to their counts
+    int totalNgrams_ = 0;              // total number of n-grams
 };
 
 #endif
