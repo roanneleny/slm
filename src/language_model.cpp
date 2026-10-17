@@ -48,6 +48,24 @@ void LanguageModel::trainFromFile(const std::string& filename, int n) {
 
     }
 
+    // 6. count the following character for each n-gram
+    nextCharCounts_.clear();
+    totalNextCounts_.clear();
+
+    for (int i = 0; i < totalNgrams_; ++i) {
+        std::string ngram = text_.substr(i, n_); //new cycle need to be recalculated for each position
+
+        // since the position of the next character is i + n_
+        int nextPos = i + n_;
+        if (nextPos < static_cast<int>(text_.size())) {
+            char nextChar = text_[nextPos]; 
+            nextCharCounts_[ngram][nextChar] += 1;
+            totalNextCounts_[ngram] += 1;
+        }
+        // if nextPos is not less than text_.size(), 
+        // it means there is no following character for this n-gram
+    }
+
 }
 
 double LanguageModel::ngramFrequency(const std::string& ngram) const {
@@ -56,4 +74,47 @@ double LanguageModel::ngramFrequency(const std::string& ngram) const {
         return 0.0;
     }
     return static_cast<double>(it->second) / totalNgrams_;
+}
+
+
+int LanguageModel::totalNextCount(const std::string& ngram) const {
+    auto it = totalNextCounts_.find(ngram);
+    if (it == totalNextCounts_.end()) {
+        return 0;
+    }
+    return it->second;
+}
+
+
+bool LanguageModel::hasNextDistribution(const std::string& ngram) const {
+    return totalNextCount(ngram) > 0;//totalNextCount(ngram) > 0 could be true or false.
+}
+
+
+double LanguageModel::nextCharProbability(const std::string& ngram,
+                                          char c,
+                                          double alpha) const {
+    int total = totalNextCount(ngram);
+    int count = 0;
+
+    auto it = nextCharCounts_.find(ngram);
+    if (it != nextCharCounts_.end()) {
+        auto charIt = it->second.find(c); //find the matched pair of c(c = a or b) of {ab:{a:2, b:1}}
+        if (charIt != it->second.end()) { // if c is found in the nextCharCounts_
+            count = charIt->second;
+        }
+    }
+
+    double alphabetSize = static_cast<double>(alphabet_.size());
+
+    if (alpha == 0.0) {
+        if (total == 0) {
+            // No following character for this n-gram, return 0 (caller should check hasNextDistribution)
+            return 0.0;
+        }
+        return static_cast<double>(count) / total;
+    }
+
+    // pseudocount
+    return (count + alpha) / (total + alpha * alphabetSize);
 }

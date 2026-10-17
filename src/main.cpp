@@ -100,17 +100,17 @@ int main(int argc, char* argv[]) {
         LanguageModel model;
         model.trainFromFile(args.filename, args.n);
 
-        // for now, just print the training output to verify correctness
         cout << "text length = " << model.text().size() << "\n";
         cout << "alphabet size = " << model.alphabetSize() << "\n";
         cout << "total n-grams = " << model.totalNgrams() << "\n";
-        cout << "n-gram frequencies:\n";
+        cout << "\n";
+
+        // print n-gram frequencies
         for (const auto& pair : model.ngramCounts()) {
             const string& ngram = pair.first;
-            int count = pair.second;
-            double freq = model.ngramFrequency(ngram);
+            //为什么这里不用指针啊！
 
-            cout << " ";
+            cout << "ngram";
 
             for (char c : ngram){
                 if (c == ' ')       cout << "_"; 
@@ -118,8 +118,29 @@ int main(int argc, char* argv[]) {
                 else if (c == '\t') cout << "\\t";
                 else                cout << c;
             }
-            cout << ": count = " << count
-                << ", frequency = " << freq << "\n";
+            cout << ":\n";
+
+            //????????
+            bool hasDist = model.hasNextDistribution(ngram) || args.alpha > 0.0;
+            if (!hasDist) {
+                cout << "  (no next character distribution)\n";
+                continue;
+            }
+
+
+            for (char c : model.alphabet()) {
+                double p = model.nextCharProbability(ngram, c, args.alpha);
+
+                if (p > 0.0) {
+                    cout << " ->";
+                    if (c == ' ')       cout << "_";
+                    else if (c == '\n') cout << "\\n";
+                    else if (c == '\t') cout << "\\t";
+                    else                cout << c;
+                    cout << ": " << p << "\n";
+                }
+            }
+
         }
 
     } catch (const exception& e) {
