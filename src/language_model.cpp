@@ -5,6 +5,10 @@
 #include <stdexcept>
 
 void LanguageModel::trainFromFile(const std::string& filename, int n) {
+    if (n <= 0) {
+        throw std::invalid_argument("n must be a positive integer");
+    }// check if n is positive??????
+
     n_ = n;
 
     // 1. Open the file
@@ -24,10 +28,16 @@ void LanguageModel::trainFromFile(const std::string& filename, int n) {
         throw std::runtime_error("training text is empty");
     }
 
+    /*
     if (static_cast<int>(text_.size()) < n + 1){
         throw std::runtime_error(
             "training text is too short to contain any n-gram followed by a character"
         );
+    }
+    */
+    if (text_.size() < static_cast<std::size_t>(n) + 1) {
+        throw std::runtime_error(
+            "training text is too short to contain any n-gram followed by a character");
     }
 
     // 4. construct alphabet
