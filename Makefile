@@ -1,3 +1,8 @@
+CXXFLAGS = ... -MMD -MP
+DEPS = $(OBJS:.o=.d)
+-include $(DEPS)
+
+
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
 
@@ -14,11 +19,11 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-%.o: %.cpp
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(DEPS) $(TARGET)
 
 
 .PHONY: all clean
