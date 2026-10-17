@@ -5,7 +5,7 @@ TARGET = slm
 
 SRC_DIR = src
 
-SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/language_model.cpp
+SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/language_model.cpp $(SRC_DIR)/text_generator.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

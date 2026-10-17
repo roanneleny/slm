@@ -3,6 +3,7 @@
 #include <string>
 
 #include "language_model.h"
+#include "text_generator.h"
 
 using namespace std;
 
@@ -100,6 +101,12 @@ int main(int argc, char* argv[]) {
         LanguageModel model;
         model.trainFromFile(args.filename, args.n);
 
+        TextGenerator generator(model, args.alpha);
+        string result = generator.generate(args.length);
+
+        cout << result << "\n";
+
+        /*单纯代码调试
         cout << "text length = " << model.text().size() << "\n";
         cout << "alphabet size = " << model.alphabetSize() << "\n";
         cout << "total n-grams = " << model.totalNgrams() << "\n";
@@ -140,8 +147,9 @@ int main(int argc, char* argv[]) {
                     cout << ": " << p << "\n";
                 }
             }
-
+        
         }
+        */
 
     } catch (const exception& e) {
         cerr << "slm: " << e.what() << "\n";
